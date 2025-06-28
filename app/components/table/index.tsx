@@ -88,7 +88,7 @@ const Table: FC<TableProps> = ({ data }) => {
   };
 
   return (
-    <div className="w-full p-4 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div className="w-full p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* هدر جدول با جستجو و عنوان */}
@@ -124,7 +124,7 @@ const Table: FC<TableProps> = ({ data }) => {
 
           {/* جدول اصلی */}
           <div className="overflow-x-auto">
-            <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+            <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 ">
               <thead className="bg-gray-50">
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
