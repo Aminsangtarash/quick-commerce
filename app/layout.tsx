@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${Dana.className} antialiased`}
+        className={`${Dana.className} `}
       >
         {children}
       </body>

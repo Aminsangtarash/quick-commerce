@@ -25,9 +25,15 @@ interface TableInstanceWithHooks<D extends object>
   UseFiltersInstanceProps<D>,
   UseSortByInstanceProps<D> { }
 
+// افزودن ویژگی width به Column
+type ExtendedColumn<D extends object> = Column<D> & {
+  width?: string;
+  search?: boolean;
+};
+
 export type TableData = {
   rows: Data[];
-  columns: Column<Data>[]
+  columns: ExtendedColumn<Data>[]; // استفاده از نوع ExtendedColumn
 };
 
 type TableProps = {
@@ -36,10 +42,10 @@ type TableProps = {
 
 const Table: FC<TableProps> = ({ data }) => {
   // داده‌های جدول
-  const tdata = useMemo<Data[]>(() => data.rows, []);
+  const tdata = useMemo<Data[]>(() => data.rows, [data.rows]);
 
   // تعریف ستون‌های جدول
-  const columns = useMemo<Column<Data | any>[]>(() => data.columns, []);
+  const columns = useMemo<ExtendedColumn<Data>[]>(() => data.columns, [data.columns]);
 
   // فیلتر جستجو
   const [filterInput, setFilterInput] = useState('');
@@ -47,11 +53,13 @@ const Table: FC<TableProps> = ({ data }) => {
   // تعریف فیلتر سراسری
   const defaultColumn = useMemo(() => ({
     Filter: ({ column }: { column: any }) => (
+      column.search ?
       <input
         className="w-full p-1 text-xs border rounded"
-        placeholder={`جستجو ${column.Header}...`}
+        placeholder={`جستجو ...`}
         onChange={e => column.setFilter(e.target.value)}
       />
+      : <></>
     ),
   }), []);
 
@@ -88,9 +96,9 @@ const Table: FC<TableProps> = ({ data }) => {
   };
 
   return (
-    <div className="w-full p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl min-h-screen">
+    <div className="w-full p-4 bg-[var(--background2)] rounded-2xl min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-[var(--background)] rounded-2xl shadow-xl overflow-hidden">
           {/* هدر جدول با جستجو و عنوان */}
           <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -101,7 +109,7 @@ const Table: FC<TableProps> = ({ data }) => {
                   placeholder="جستجو بر اساس نام..."
                   value={filterInput}
                   onChange={handleFilterChange}
-                  className="w-full p-3 pr-10 rounded-lg bg-white/10 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className="w-full p-3 pr-10 rounded-lg bg-[var(--background)]/10 text-[var(--foreground)] placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <svg
                   className="absolute right-3 top-3.5 text-blue-200"
@@ -124,14 +132,20 @@ const Table: FC<TableProps> = ({ data }) => {
 
           {/* جدول اصلی */}
           <div className="overflow-x-auto">
-            <table {...getTableProps()} className="min-w-full divide-y divide-gray-200 ">
-              <thead className="bg-gray-50">
+            <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-[var(--hover-color)]">
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column: any) => (
                       <th
                         {...column.getHeaderProps(column.getSortByToggleProps())}
-                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-6 py-3 text-right text-xs font-medium text-[var(--text-color)] uppercase tracking-wider"
+                        // تنظیم عرض ستون بر اساس مقدار تعریف شده
+                        style={{ 
+                          width: column.width || 'auto', 
+                          minWidth: column.width || 'auto',
+                          maxWidth: column.width || 'none'
+                        }}
                       >
                         <div className="flex items-center gap-1">
                           <span>{column.render('Header')}</span>
@@ -151,15 +165,23 @@ const Table: FC<TableProps> = ({ data }) => {
                   </tr>
                 ))}
               </thead>
-              <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
+              <tbody {...getTableBodyProps()} className="divide-y divide-gray-200">
                 {rows.map((row: Row<Data>) => {
                   prepareRow(row);
                   return (
-                    <tr {...row.getRowProps()} className="hover:bg-blue-50 transition-colors">
+                    <tr {...row.getRowProps()} className="hover:bg-[var(--hover-color)] transition-colors">
                       {row.cells.map(cell => (
                         <td
                           {...cell.getCellProps()}
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                          className="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-color)]"
+                          // تنظیم عرض ستون بر اساس مقدار تعریف شده
+                          style={{ 
+                            width: cell.column.width || 'auto', 
+                            minWidth: cell.column.width || 'auto',
+                            maxWidth: cell.column.width || 'none',
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
                         >
                           {cell.render('Cell')}
                         </td>
@@ -172,31 +194,31 @@ const Table: FC<TableProps> = ({ data }) => {
           </div>
 
           {/* پانوشت جدول */}
-          <div className="bg-gray-50 px-6 py-4 flex flex-col md:flex-row justify-between items-center border-t border-gray-200">
+          <div className="bg-[var(--hover-color)] px-6 py-4 flex flex-col md:flex-row justify-between items-center border-t border-gray-200">
             <div className="text-sm text-gray-500 mb-2 md:mb-0">
               نمایش <span className="font-medium">{rows.length}</span> رکورد از {tdata.length} رکورد
             </div>
-            <div className="flex space-x-2">
+            {/* <div className="flex space-x-2">
               <button className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 خروجی Excel
               </button>
               <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition">
                 چاپ جدول
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* راهنمای استفاده */}
-        <div className="mt-8 p-6 bg-white rounded-2xl shadow-lg">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">راهنمای استفاده از جدول</h2>
+        <div className="mt-8 p-6 bg-[var(--background)] rounded-2xl shadow-lg">
+          <h2 className="text-xl font-bold text-gray-500 mb-4">راهنمای استفاده از جدول</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="flex items-center mb-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center ml-2">
                   <span className="text-indigo-700">1</span>
                 </div>
-                <h3 className="font-medium">مرتب‌سازی</h3>
+                <h3 className="font-medium text-gray-800">مرتب‌سازی</h3>
               </div>
               <p className="text-sm text-gray-600">
                 برای مرتب‌سازی داده‌ها بر اساس هر ستون، روی عنوان ستون کلیک کنید. با هر کلیک جهت مرتب‌سازی تغییر می‌کند.
@@ -204,10 +226,10 @@ const Table: FC<TableProps> = ({ data }) => {
             </div>
             <div className="p-4 bg-green-50 rounded-lg">
               <div className="flex items-center mb-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center ml-2">
                   <span className="text-green-700">2</span>
                 </div>
-                <h3 className="font-medium">فیلتر کردن</h3>
+                <h3 className="font-medium text-gray-800">فیلتر کردن</h3>
               </div>
               <p className="text-sm text-gray-600">
                 برای فیلتر کردن داده‌ها در هر ستون، از کادر جستجوی بالای هر ستون استفاده کنید.
@@ -215,10 +237,10 @@ const Table: FC<TableProps> = ({ data }) => {
             </div>
             <div className="p-4 bg-purple-50 rounded-lg">
               <div className="flex items-center mb-2">
-                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
+                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center ml-2">
                   <span className="text-purple-700">3</span>
                 </div>
-                <h3 className="font-medium">جستجوی سراسری</h3>
+                <h3 className="font-medium text-gray-800">جستجوی سراسری</h3>
               </div>
               <p className="text-sm text-gray-600">
                 برای جستجوی کل داده‌ها، از کادر جستجوی بالای جدول استفاده کنید.

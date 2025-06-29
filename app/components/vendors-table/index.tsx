@@ -7,18 +7,12 @@ import axios from "axios";
 const tableData: TableData = {
     rows: [],
     columns: [
-        { Header: 'شناسه', accessor: 'vendor_identifier', width: 80 },
-        { Header: 'نام غرفه', accessor: 'vendor_name_persian' },
-        { Header: 'شماره تماس', accessor: 'phone_number_of_owner' },
+        { Header: 'شناسه', accessor: 'vendor_identifier', width: '110px', search: true },
+        { Header: 'نام غرفه', accessor: 'vendor_name_persian', width: '350px', search: true },
+        { Header: 'شماره تماس', accessor: 'phone_number_of_owner', search: true },
         { Header: 'تعداد سفارشات', accessor: 'the_number_of_purchase' },
         { Header: 'تعداد محصولات', accessor: 'the_number_of_products' },
         { Header: 'تعداد فروش', accessor: 'the_number_of_sold_products' },
-        // {
-        //     Header: 'حقوق (تومان)',
-        //     accessor: 'the_number_of_products',
-        //     Cell: ({ value }: CellProps<Data, number>) => <span>{value.toLocaleString('fa-IR')}</span>
-        // },
-        { Header: 'تاریخ شروع', accessor: 'startDate' },
         {
             Header: 'وضعیت',
             accessor: 'is_active',
