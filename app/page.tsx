@@ -2,14 +2,14 @@ import VendorsTable from "./components/vendors-table";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+    <div className="flex justify-items-center py-10 sm:py-20 sm:px-20">
+      <main className="flex flex-col max-w-full items-center sm:items-start">
         <h1
-          className="text-[70px] font-black text-center w-full"
+          className="text-[70px] font-black text-center w-full mb-10"
         >
           Quick Commerce
         </h1>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+        <div className="flex gap-4 items-center max-w-full flex-col sm:flex-row">
           <VendorsTable/>
         </div>
       </main>
