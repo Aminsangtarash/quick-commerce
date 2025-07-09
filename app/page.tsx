@@ -2,7 +2,7 @@ import VendorsTable from "./components/vendors-table";
 
 export default function Home() {
   return (
-    <div className="flex justify-items-center py-10 sm:py-20 sm:px-20">
+    <div className="flex justify-center py-10 sm:py-20 sm:px-20">
       <main className="flex flex-col max-w-full items-center sm:items-start">
         <h1
           className="text-[70px] font-black text-center w-full mb-10"
