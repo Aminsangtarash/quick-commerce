@@ -30,7 +30,7 @@ export default function VendorsTable() {
 
     useEffect(() => {
         axios.get(
-            "https://q-commerce-api.basalam.com/ui/vendors/?limit=10&offset=0",
+            "https://q-commerce-api.basalam.com/v1/vendors/?limit=10&offset=0",
         )
             .then((res) => {
                 setData(prev => ({ ...prev, rows: res.data.vendors }))
