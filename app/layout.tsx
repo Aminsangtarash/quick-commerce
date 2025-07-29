@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${Dana.className} `}
+        className={`${Dana.className} p-10`}
       >
         {children}
       </body>

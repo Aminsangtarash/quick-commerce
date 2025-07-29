@@ -1,9 +1,16 @@
+import Select from "@/components/select";
+
 function Products() {
-    return ( 
+    return (
         <div className="">
-            محصولات
+            <div className="flex">
+                <Select/>
+            </div>
+            <div>
+
+            </div>
         </div>
-     );
+    );
 }
 
 export default Products;
