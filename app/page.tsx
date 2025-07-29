@@ -1,4 +1,4 @@
-import VendorsTable from "./components/vendors-table";
+import VendorsTable from "../components/vendors-table";
 
 export default function Home() {
   return (
