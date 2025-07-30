@@ -1,3 +1,4 @@
+import Button from "@/components/button";
 import Input from "@/components/input";
 import Select from "@/components/select";
 
@@ -5,7 +6,7 @@ function Products() {
     return (
         <div className="">
             <div className="flex gap-5">
-                <Input 
+                <Input
                     label="جستجو در عنوان"
                 />
                 <Select
@@ -28,8 +29,14 @@ function Products() {
                     ]}
                 />
             </div>
-            <div>
-
+            <div className="flex">
+                <div className="flex flex-col mt-4">
+                    <Button className="mt-2">افزودن تگ</Button>
+                    <Button className="mt-2">حذف تگ</Button>
+                </div>
+                <div>
+                    
+                </div>
             </div>
         </div>
     );

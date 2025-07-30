@@ -19,7 +19,7 @@ function Select({ options = [], label }: SelectProps) {
                 <option value={1}>انتخاب کنید</option>
                 {
                     options.map((option) =>
-                        <option value={option.value}>{option.name}</option>
+                        <option key={option.name+option.value} value={option.value}>{option.name}</option>
                     )
                 }
             </select>
