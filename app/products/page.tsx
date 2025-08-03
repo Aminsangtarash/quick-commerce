@@ -1,8 +1,16 @@
+'use client'
 import Button from "@/components/button";
 import Input from "@/components/input";
 import Select from "@/components/select";
+import axios from "axios";
+import { useEffect } from "react";
 
 function Products() {
+
+    useEffect(() => {
+        axios
+    }, [])
+
     return (
         <div className="">
             <div className="flex gap-5">
@@ -34,7 +42,7 @@ function Products() {
                     <Button className="mt-2">افزودن تگ</Button>
                     <Button className="mt-2">حذف تگ</Button>
                 </div>
-                <div>
+                <div className="flex gap-2">
                     
                 </div>
             </div>
