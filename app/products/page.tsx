@@ -1,14 +1,20 @@
 'use client'
+import axios from "@/axios-instance";
 import Button from "@/components/button";
+import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
-import axios from "axios";
-import { useEffect } from "react";
+import { Product } from "@/types/product";
+import { useEffect, useState } from "react";
 
 function Products() {
+    const [products, setProducts] = useState<Product[]>([])
 
     useEffect(() => {
-        axios
+        axios.get("/vendor-products/products?per_page=10&page=1")
+            .then(res => {
+                setProducts(res.data.data)
+            })
     }, [])
 
     return (
@@ -37,13 +43,23 @@ function Products() {
                     ]}
                 />
             </div>
-            <div className="flex">
-                <div className="flex flex-col mt-4">
-                    <Button className="mt-2">افزودن تگ</Button>
-                    <Button className="mt-2">حذف تگ</Button>
+            <div className="grid my-10">
+                <div className="flex flex-col col-2">
+                    <Button className="">افزودن تگ</Button>
+                    <Button variant="secondary" className="mt-2">حذف تگ</Button>
                 </div>
-                <div className="flex gap-2">
-                    
+                <div className="flex flex-wrap gap-2 col-10 px-5">
+                    {
+                        products.map((product) =>
+                            <Card
+                                key={product.id}
+                                imageUrl={product.photo?.md}
+                                title={product.title}
+                                price={876786}
+                                check
+                            />
+                        )
+                    }
                 </div>
             </div>
         </div>

@@ -12,8 +12,8 @@ function Button({ variant = "primary", className = "", children, ...props }: But
   
   const variantStyles = {
     primary: "bg-[var(--primary)] text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-    secondary: "bg-[var(--secondary)] text-secondary-800 hover:bg-secondary-300 focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2",
-    tertiary: "bg-[var(--tertiary)] text-tertiary-600 border border-tertiary-600 hover:bg-tertiary-50 focus:ring-2 focus:ring-tertiary-500 focus:ring-offset-2"
+    secondary: "bg-[var(--secondary)] text-white hover:bg-secondary-300 focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2",
+    tertiary: "bg-[var(--tertiary)] text-white border border-tertiary-600 hover:bg-tertiary-50 focus:ring-2 focus:ring-tertiary-500 focus:ring-offset-2"
   };
 
   const classes = twMerge(baseStyles, variantStyles[variant], className);
