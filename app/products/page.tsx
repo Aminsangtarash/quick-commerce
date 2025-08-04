@@ -8,7 +8,7 @@ import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 
 function Products() {
-    const [products, setProducts] = useState<Product[]>([])
+    const [products, setProducts] = useState<Partial<Product>[]>([])
 
     useEffect(() => {
         axios.get("/vendor-products/products?per_page=10&page=1")
@@ -48,7 +48,7 @@ function Products() {
                     <Button className="">افزودن تگ</Button>
                     <Button variant="secondary" className="mt-2">حذف تگ</Button>
                 </div>
-                <div className="flex flex-wrap gap-2 col-10 px-5">
+                <div className="flex flex-wrap gap-6 col-10 px-5">
                     {
                         products.map((product) =>
                             <Card

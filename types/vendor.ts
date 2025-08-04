@@ -31,10 +31,10 @@ interface ShippingMethod {
 }
 
 interface HomeTabSetting {
-    "name": "banners",
-    "order": 1,
-    "is_active": true,
-    "extra_data": null
+    name: string;
+    order: number;
+    is_active: boolean;
+    extra_data: any;
 }
 
 export interface Vendor {

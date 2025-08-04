@@ -1,33 +1,38 @@
 import { Picture } from "./picture";
 
+interface Gender {
+    name: string;
+    value: number;
+    description?: string | null;
+}
+
+interface Province {
+    name: string;
+    value: number;
+    description?: string | null;
+}
+
+interface City {
+    name: string;
+    value: number;
+    province: Province;
+}
 export interface User {
     id: number;
     hash_id: string;
     username: string | null;
     name: string;
-    avatar: Picture,
-    "marked_type": null,
-    "user_follower_count": 258,
-    "user_following_count": 1,
-    "gender": {
-        "name": "مرد",
-        "value": 3265,
-        "description": null
-    },
-    "bio": "سلام و عرض ادب\n🚧🛑 توجه\nوزن محصولات حدودی است و امکان مقداری اختلاف وزن با چیزی که در غرفه ثبت شده است وجود دارد.",
-    "city": {
-        "name": "قم",
-        "value": 2531,
-        "province": {
-            "name": "قم",
-            "value": 21,
-            "description": null
-        }
-    },
-    "created_at": "2025-01-07T10:47:31+03:30",
-    "last_activity": "2025-08-03T14:22:46+03:30",
-    "referral_journey_enum": null,
-    "is_banned_in_social": false,
-    "ban_user": {},
-    "vendor": null
+    avatar: Picture;
+    marked_type: number | null;
+    user_follower_count: number;
+    user_following_count: number;
+    gender: Gender;
+    bio: string;
+    city: City;
+    created_at: string;
+    last_activity: string;
+    referral_journey_enum: string | null;
+    is_banned_in_social: boolean;
+    ban_user: object;
+    vendor: any | null;
 }
