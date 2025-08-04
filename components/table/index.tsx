@@ -139,7 +139,10 @@ const Table: FC<TableProps> = ({ data }) => {
                           maxWidth: column.width || "none",
                         }}
                       >
-                        <div className="flex items-center gap-1">
+                        <div
+                          key={`header-content-${headerGroupIndex}-${columnIndex}-`} // Add unique key here
+                          className="flex items-center gap-1"
+                        >
                           <span>{column.render("Header")}</span>
                           {/* Sort icon */}
                           <span>
@@ -155,7 +158,12 @@ const Table: FC<TableProps> = ({ data }) => {
                           </span>
                         </div>
                         {/* Column filter */}
-                        <div className="mt-1">{column.canFilter ? column.render("Filter") : null}</div>
+                        <div
+                          key={`filter-${headerGroupIndex}-${columnIndex}`} // Add unique key here
+                          className="mt-1"
+                        >
+                          {column.canFilter ? column.render("Filter") : null}
+                        </div>
                       </th>
                     ))}
                   </tr>
