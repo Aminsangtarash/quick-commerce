@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from 'next/font/local'
+import Header from "@/components/header";
 
 const Dana = localFont({
   src: [
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body
         className={`${Dana.className} py-10 md:px-10`}
       >
+        <Header/>
         {children}
       </body>
     </html>

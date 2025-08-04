@@ -95,7 +95,7 @@ function Products() {
                     <Button variant="error" className="mt-2">حذف تگ</Button>
                 </div>
                 <InfiniteScroll
-                    dataLength={products.length}
+                    dataLength={products?.length??0}
                     next={() => fetchProducts()}
                     hasMore={hasMore}
                     loader={<div className="text-center py-4">در حال بارگذاری...</div>}
