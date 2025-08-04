@@ -1,5 +1,5 @@
-"use client"
-import React, { useState, useMemo, FC, ReactNode, ElementType } from 'react';
+"use client";
+import React, { useState, useMemo, FC } from "react";
 import {
   Column,
   useTable,
@@ -9,23 +9,18 @@ import {
   TableInstance,
   UseFiltersInstanceProps,
   UseSortByInstanceProps,
-  HeaderGroup,
   Row,
-  CellProps
-} from 'react-table';
+} from "react-table";
 
-// تعریف نوع داده‌ای برای رکوردها
 export interface Data {
   [key: string]: any;
 }
 
-// تعریف نوع برای جدول با فیلترها و سورت
 interface TableInstanceWithHooks<D extends object>
   extends TableInstance<D>,
   UseFiltersInstanceProps<D>,
   UseSortByInstanceProps<D> { }
 
-// افزودن ویژگی width به Column
 type ExtendedColumn<D extends object> = Column<D> & {
   width?: string;
   search?: boolean;
@@ -33,73 +28,67 @@ type ExtendedColumn<D extends object> = Column<D> & {
 
 export type TableData = {
   rows: Data[];
-  columns: ExtendedColumn<Data>[]; // استفاده از نوع ExtendedColumn
+  columns: ExtendedColumn<Data>[];
 };
 
 type TableProps = {
-  data: TableData
-}
+  data: TableData;
+};
 
 const Table: FC<TableProps> = ({ data }) => {
-  // داده‌های جدول
   const tdata = useMemo<Data[]>(() => data.rows, [data.rows]);
-
-  // تعریف ستون‌های جدول
   const columns = useMemo<ExtendedColumn<Data>[]>(() => data.columns, [data.columns]);
+  const [filterInput, setFilterInput] = useState("");
 
-  // فیلتر جستجو
-  const [filterInput, setFilterInput] = useState('');
+  const defaultColumn = useMemo(
+    () => ({
+      Filter: ({ column }: { column: any }) =>
+        column.search ? (
+          <input
+            className="w-full p-1 text-xs border rounded"
+            placeholder="جستجو ..."
+            onChange={(e) => column.setFilter(e.target.value)}
+          />
+        ) : (
+          <></>
+        ),
+    }),
+    []
+  );
 
-  // تعریف فیلتر سراسری
-  const defaultColumn = useMemo(() => ({
-    Filter: ({ column }: { column: any }) => (
-      column.search ?
-      <input
-        className="w-full p-1 text-xs border rounded"
-        placeholder={`جستجو ...`}
-        onChange={e => column.setFilter(e.target.value)}
-      />
-      : <></>
-    ),
-  }), []);
-
-  // استفاده از هوک‌های react-table با تایپ صحیح
+  // Use react-table hooks with proper typing
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-    setAllFilters
+    setAllFilters,
   } = useTable(
     {
       columns,
       data: tdata,
       defaultColumn,
       initialState: {
-        sortBy: [{ id: 'id', desc: false }]
-      }
+        sortBy: [{ id: "id", desc: false }],
+      },
     } as TableOptions<Data>,
     useFilters,
     useSortBy
   ) as TableInstanceWithHooks<Data>;
 
-  // اعمال فیلتر جستجوی سراسری
+  // Handle global filter change
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value || '';
+    const value = e.target.value || "";
     setFilterInput(value);
-
-    // استفاده از setAllFilters به جای setFilter
-    setAllFilters([
-      { id: 'name', value }
-    ]);
+    setAllFilters([{ id: "name", value }]);
   };
 
   return (
     <div className="w-full p-4 sm:bg-[var(--background2)] rounded-2xl">
       <div className="max-w-full mx-auto">
         <div className="bg-[var(--background)] rounded-2xl shadow-xl overflow-hidden">
-          {/* هدر جدول با جستجو و عنوان */}
+          {/* Table header with search and title */}
           <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <h1 className="text-2xl font-bold">لیست غرفه داران</h1>
@@ -130,60 +119,73 @@ const Table: FC<TableProps> = ({ data }) => {
             </div>
           </div>
 
-          {/* جدول اصلی */}
+          {/* Main table */}
           <div className="overflow-x-auto">
             <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
               <thead className="bg-[var(--hover-color)]">
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map((column: any) => (
+                {headerGroups.map((headerGroup, headerGroupIndex) => (
+                  <tr
+                    {...headerGroup.getHeaderGroupProps()}
+                    key={`header-group-${headerGroupIndex}`}
+                  >
+                    {headerGroup.headers.map((column: any, columnIndex) => (
                       <th
                         {...column.getHeaderProps(column.getSortByToggleProps())}
+                        key={`header-${headerGroupIndex}-${columnIndex}`}
                         className="px-6 py-3 text-right text-xs font-medium text-[var(--text-color)] uppercase tracking-wider"
-                        // تنظیم عرض ستون بر اساس مقدار تعریف شده
-                        style={{ 
-                          width: column.width || 'auto', 
-                          minWidth: column.width || 'auto',
-                          maxWidth: column.width || 'none'
+                        style={{
+                          width: column.width || "auto",
+                          minWidth: column.width || "auto",
+                          maxWidth: column.width || "none",
                         }}
                       >
                         <div className="flex items-center gap-1">
-                          <span>{column.render('Header')}</span>
-                          {/* آیکون مرتب‌سازی */}
+                          <span>{column.render("Header")}</span>
+                          {/* Sort icon */}
                           <span>
-                            {column.isSorted
-                              ? column.isSortedDesc
-                                ? <span className="text-indigo-600">▼</span>
-                                : <span className="text-indigo-600">▲</span>
-                              : <span className="opacity-30">↕</span>}
+                            {column.isSorted ? (
+                              column.isSortedDesc ? (
+                                <span className="text-indigo-600">▼</span>
+                              ) : (
+                                <span className="text-indigo-600">▲</span>
+                              )
+                            ) : (
+                              <span className="opacity-30">↕</span>
+                            )}
                           </span>
                         </div>
-                        {/* فیلتر ستون */}
-                        <div className="mt-1">{column.canFilter ? column.render('Filter') : null}</div>
+                        {/* Column filter */}
+                        <div className="mt-1">{column.canFilter ? column.render("Filter") : null}</div>
                       </th>
                     ))}
                   </tr>
                 ))}
               </thead>
               <tbody {...getTableBodyProps()} className="divide-y divide-gray-200">
-                {rows.map((row: Row<Data>) => {
+                {rows.map((row: Row<Data>, rowIndex) => {
                   prepareRow(row);
+                  // Use row.id if available, otherwise fall back to rowIndex
+                  const rowKey = row.id || `row-${rowIndex}`;
                   return (
-                    <tr {...row.getRowProps()} className="hover:bg-[var(--hover-color)] transition-colors">
-                      {row.cells.map(cell => (
+                    <tr
+                      {...row.getRowProps()}
+                      key={rowKey}
+                      className="hover:bg-[var(--hover-color)] transition-colors"
+                    >
+                      {row.cells.map((cell, cellIndex) => (
                         <td
                           {...cell.getCellProps()}
+                          key={`cell-${rowKey}-${cellIndex}`}
                           className="px-6 py-4 whitespace-nowrap text-sm text-[var(--text-color)]"
-                          // تنظیم عرض ستون بر اساس مقدار تعریف شده
-                          style={{ 
-                            width: cell.column.width || 'auto', 
-                            minWidth: cell.column.width || 'auto',
-                            maxWidth: cell.column.width || 'none',
+                          style={{
+                            width: cell.column.width || "auto",
+                            minWidth: cell.column.width || "auto",
+                            maxWidth: cell.column.width || "none",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                           }}
                         >
-                          {cell.render('Cell')}
+                          {cell.render("Cell")}
                         </td>
                       ))}
                     </tr>
@@ -193,23 +195,15 @@ const Table: FC<TableProps> = ({ data }) => {
             </table>
           </div>
 
-          {/* پانوشت جدول */}
+          {/* Table footer */}
           <div className="bg-[var(--hover-color)] px-6 py-4 flex flex-col md:flex-row justify-between items-center border-t border-gray-200">
             <div className="text-sm text-gray-500 mb-2 md:mb-0">
               نمایش <span className="font-medium">{rows.length}</span> رکورد از {tdata.length} رکورد
             </div>
-            {/* <div className="flex space-x-2">
-              <button className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                خروجی Excel
-              </button>
-              <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition">
-                چاپ جدول
-              </button>
-            </div> */}
           </div>
         </div>
 
-        {/* راهنمای استفاده */}
+        {/* Usage guide */}
         <div className="mt-8 p-6 bg-[var(--background)] rounded-2xl shadow-lg">
           <h2 className="text-xl font-bold text-gray-500 mb-4">راهنمای استفاده از جدول</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
