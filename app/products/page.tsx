@@ -32,8 +32,11 @@ function Products() {
                 },
             });
             const newProducts = response.data.data;
-            setProducts((prev) => (reset ? newProducts : [...prev, ...newProducts]));
-            //   setHasMore(response.data.meta?.has_more || false);
+            if (newProducts) {
+                setProducts((prev) => (reset ? newProducts : [...prev, ...newProducts]));
+            } else {
+                setHasMore(response.data.meta?.has_more || false);
+            }
             if (!reset) setPage((prev) => prev + 1);
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -74,7 +77,7 @@ function Products() {
                 />
                 <Select
                     label="غرفه"
-                    options={vendors?.map(vendor => ({name: vendor.title, value: vendor.id}))}
+                    options={vendors?.map(vendor => ({ name: vendor.title, value: vendor.id }))}
                     onChange={(e) => handleFilterChange("booth", e.target.value)}
                 />
                 <Select
@@ -95,7 +98,7 @@ function Products() {
                     <Button variant="error" className="mt-2">حذف تگ</Button>
                 </div>
                 <InfiniteScroll
-                    dataLength={products?.length??0}
+                    dataLength={products?.length ?? 0}
                     next={() => fetchProducts()}
                     hasMore={hasMore}
                     loader={<div className="text-center py-4">در حال بارگذاری...</div>}
