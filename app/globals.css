@@ -9,6 +9,7 @@
   --primary: #2563eb;
   --secondary: #6b7280;
   --tertiary: #10b981;
+  --error: #d33824;
 }
 
 @theme inline {
@@ -28,6 +29,7 @@
     --primary: #2563eb;
     --secondary: #6b7280;
     --tertiary: #10b981;
+    --error: #d33824;
   }
 }
 

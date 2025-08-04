@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${Dana.className} p-10`}
+        className={`${Dana.className} py-10 md:px-10`}
       >
         {children}
       </body>

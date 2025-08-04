@@ -8,7 +8,8 @@ import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 
 function Products() {
-    const [products, setProducts] = useState<Product[]>([])
+    const [products, setProducts] = useState<Product[]>([]);
+    const [checkedProducts, setCheckedProducts] = useState<number[]>([]);
 
     useEffect(() => {
         axios.get("/vendor-products/products?per_page=30&page=1")
@@ -17,9 +18,18 @@ function Products() {
             })
     }, [])
 
+    const handleClickProduct = (id: number) => {
+        setCheckedProducts(prev => {
+            if(prev.includes(id)) {
+                return prev.filter(x => x !== id)
+            }
+            return ([...prev, id])
+        })
+    }
+
     return (
         <div className="">
-            <div className="flex gap-5">
+            <div className="flex flex-xs-col flex-md-row flex-wrap justify-center gap-5 ">
                 <Input
                     label="جستجو در عنوان"
                 />
@@ -43,20 +53,21 @@ function Products() {
                     ]}
                 />
             </div>
-            <div className="grid my-10">
-                <div className="flex flex-col col-2">
+            <div className="grid md:grid-cols-[130px_1fr] my-10">
+                <div className="hidden md:flex flex-col ">
                     <Button className="">افزودن تگ</Button>
-                    <Button variant="secondary" className="mt-2">حذف تگ</Button>
+                    <Button variant="error" className="mt-2">حذف تگ</Button>
                 </div>
-                <div className="flex flex-wrap gap-6 col-10 px-5">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 px-5">
                     {
                         products.map((product) =>
                             <Card
                                 key={product.id}
                                 imageUrl={product.photo?.md}
                                 title={product.title}
-                                price={product.price}
-                                check
+                                price={product.price/10}
+                                checked={checkedProducts.includes(product.id)}
+                                onClick={() => handleClickProduct(product.id)}
                             />
                         )
                     }
