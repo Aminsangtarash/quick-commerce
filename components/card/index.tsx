@@ -30,7 +30,7 @@ function Card({ imageUrl, title, subtitle, price, check }: CardProps) {
             </div>
             <h4 className="w-full overflow-hidden text-ellipsis truncate my-1">{title}</h4>
             <span>{subtitle}</span>
-            <span>{price}</span>
+            <span>{price.toLocaleString()}</span>
         </div>
     );
 }

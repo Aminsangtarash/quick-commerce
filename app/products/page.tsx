@@ -8,10 +8,10 @@ import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 
 function Products() {
-    const [products, setProducts] = useState<Partial<Product>[]>([])
+    const [products, setProducts] = useState<Product[]>([])
 
     useEffect(() => {
-        axios.get("/vendor-products/products?per_page=10&page=1")
+        axios.get("/vendor-products/products?per_page=30&page=1")
             .then(res => {
                 setProducts(res.data.data)
             })
@@ -55,7 +55,7 @@ function Products() {
                                 key={product.id}
                                 imageUrl={product.photo?.md}
                                 title={product.title}
-                                price={876786}
+                                price={product.price}
                                 check
                             />
                         )
