@@ -5,6 +5,7 @@ import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
 import { Product } from "@/types/product";
+import { Tag } from "@/types/tag";
 import { Vendor } from "@/types/vendor";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -17,6 +18,7 @@ function Products() {
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({ search: "", booth: "", tag: "" });
     const [vendors, setVendors] = useState<Vendor[]>([])
+    const [tags, setTags] = useState<Tag[]>([])
 
     const fetchProducts = async (reset = false) => {
         if (loading) return;
@@ -68,6 +70,13 @@ function Products() {
             })
     }, [])
 
+    useEffect(() => {
+        axios.get("/tags/tag-list")
+            .then(res => {
+                setTags(res.data.tags)
+            })
+    }, [])
+
     return (
         <div className="">
             <div className="flex flex-xs-col flex-md-row flex-wrap justify-center gap-5">
@@ -82,13 +91,7 @@ function Products() {
                 />
                 <Select
                     label="تگ"
-                    options={[
-                        { name: "ارسال 2 ساعته به قم", value: 2 },
-                        { name: "ارسال 3 ساعته به قم", value: 3 },
-                        { name: "ارسال 4 ساعته به قم", value: 4 },
-                        { name: "ارسال 5 ساعته به قم", value: 5 },
-                        { name: "ارسال امروز به قم", value: 6 },
-                    ]}
+                    options={tags?.map(tag => ({ name: tag.title, value: tag.tag_id }))}
                     onChange={(e) => handleFilterChange("tag", e.target.value)}
                 />
             </div>
