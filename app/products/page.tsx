@@ -16,7 +16,7 @@ function Products() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [filters, setFilters] = useState({ search: "", booth: "", tag: "" });
+    const [filters, setFilters] = useState({ search: null, booth: 0, tag: null });
     const [vendors, setVendors] = useState<Vendor[]>([])
     const [tags, setTags] = useState<Tag[]>([])
 
@@ -30,7 +30,7 @@ function Products() {
                     page: reset ? 1 : (page + 1),
                     product_title: filters.search,
                     vendor_ids: +filters.booth ? +filters.booth : undefined,
-                    tag_id: filters.tag,
+                    tag_id: filters.tag ? filters.tag : undefined,
                 },
             });
             const newProducts = response.data.data;
