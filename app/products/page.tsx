@@ -30,7 +30,7 @@ function Products() {
                     page: reset ? 1 : (page + 1),
                     product_title: filters.search,
                     vendor_ids: +filters.booth ? +filters.booth : undefined,
-                    tag: filters.tag,
+                    tag_id: filters.tag,
                 },
             });
             const newProducts = response.data.data;
