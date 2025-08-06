@@ -54,7 +54,7 @@ function Products() {
 
     const handleClickProduct = (id: number) => {
         setCheckedProducts((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(id) ? prev?.filter((x) => x !== id) : [...prev, id]
         );
     };
 

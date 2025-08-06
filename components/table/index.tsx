@@ -81,7 +81,7 @@ const Table: FC<TableProps> = ({ data }) => {
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value || "";
     setFilterInput(value);
-    setAllFilters([{ id: "name", value }]);
+    setAllFilters([{ id: "title", value }]);
   };
 
   return (
@@ -98,7 +98,7 @@ const Table: FC<TableProps> = ({ data }) => {
                   placeholder="جستجو بر اساس نام..."
                   value={filterInput}
                   onChange={handleFilterChange}
-                  className="w-full p-3 pr-10 rounded-lg bg-[var(--background)]/10 text-[var(--foreground)] placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className="w-full p-3 pr-10 rounded-lg bg-[var(--background)]/10 text-[var(--foreground)] placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 text-white"
                 />
                 <svg
                   className="absolute right-3 top-3.5 text-blue-200"
