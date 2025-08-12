@@ -31,7 +31,7 @@ export default function VendorsTable() {
     const [data, setData] = useState<TableData>(tableData);
     const [limit, setLimit] = useState<number>(10);
     const searchParams = useSearchParams();
-    const currentPage = (parseInt(searchParams.get("page") || "0") -1) * 10;
+    const currentPage = (parseInt(searchParams.get("page") || "1") -1) * 10;
 
     useEffect(() => {
         axios.get(`/v1/vendors/?limit=${limit}&offset=${currentPage}`,)
