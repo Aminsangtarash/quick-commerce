@@ -9,7 +9,7 @@ const axios = axiosRoot.create({
     },
 });
 
-// axios.defaults.withCredentials = true
+axios.defaults.withCredentials = true
 
 axios.interceptors.request.use(
     (config) => {
