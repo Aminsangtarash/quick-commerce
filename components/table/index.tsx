@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, FC } from "react";
+import React, { useState, useMemo, FC, ChangeEvent } from "react";
 import {
   Column,
   useTable,
@@ -11,6 +11,8 @@ import {
   UseSortByInstanceProps,
   Row,
 } from "react-table";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import Select from "../select";
 
 export interface Data {
   [key: string]: any;
@@ -29,16 +31,35 @@ type ExtendedColumn<D extends object> = Column<D> & {
 export type TableData = {
   rows: Data[];
   columns: ExtendedColumn<Data>[];
+  count?: number;
 };
 
 type TableProps = {
   data: TableData;
+  count?: number;
+  onChangeLimit?: (value: number) => void;
 };
 
-const Table: FC<TableProps> = ({ data }) => {
-  const tdata = useMemo<Data[]>(() => data.rows, [data.rows]);
-  const columns = useMemo<ExtendedColumn<Data>[]>(() => data.columns, [data.columns]);
+const Table: FC<TableProps> = ({ data, count, onChangeLimit = () => {} }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [filterInput, setFilterInput] = useState("");
+  const [pageSize, setPageSize] = useState(10); // Number of records per page
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+
+  // Calculate paginated data
+  const tdata = useMemo<Data[]>(() => {
+    const start = (currentPage - 1) * pageSize;
+    return data.rows;
+  }, [data.rows, currentPage, pageSize]);
+
+  const handleChangeLimit = (event: ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(+event.currentTarget.value);
+    onChangeLimit(+event.currentTarget.value)
+  }
+
+  const columns = useMemo<ExtendedColumn<Data>[]>(() => data.columns, [data.columns]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -82,6 +103,61 @@ const Table: FC<TableProps> = ({ data }) => {
     const value = e.target.value || "";
     setFilterInput(value);
     setAllFilters([{ id: "title", value }]);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil((count || data.rows.length) / pageSize);
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 mx-1 rounded ${currentPage === i
+            ? "bg-indigo-600 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-indigo-100"
+            }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 hover:bg-indigo-100"
+        >
+          قبلی
+        </button>
+        {pages}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 hover:bg-indigo-100"
+        >
+          بعدی
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -140,7 +216,7 @@ const Table: FC<TableProps> = ({ data }) => {
                         }}
                       >
                         <div
-                          key={`header-content-${headerGroupIndex}-${columnIndex}-`} // Add unique key here
+                          key={`header-content-${headerGroupIndex}-${columnIndex}`}
                           className="flex items-center gap-1"
                         >
                           <span>{column.render("Header")}</span>
@@ -159,7 +235,7 @@ const Table: FC<TableProps> = ({ data }) => {
                         </div>
                         {/* Column filter */}
                         <div
-                          key={`filter-${headerGroupIndex}-${columnIndex}`} // Add unique key here
+                          key={`filter-${headerGroupIndex}-${columnIndex}`}
                           className="mt-1"
                         >
                           {column.canFilter ? column.render("Filter") : null}
@@ -172,7 +248,6 @@ const Table: FC<TableProps> = ({ data }) => {
               <tbody {...getTableBodyProps()} className="divide-y divide-gray-200">
                 {rows.map((row: Row<Data>, rowIndex) => {
                   prepareRow(row);
-                  // Use row.id if available, otherwise fall back to rowIndex
                   const rowKey = row.id || `row-${rowIndex}`;
                   return (
                     <tr
@@ -203,11 +278,31 @@ const Table: FC<TableProps> = ({ data }) => {
             </table>
           </div>
 
-          {/* Table footer */}
+          {/* Table footer with pagination */}
           <div className="bg-[var(--hover-color)] px-6 py-4 flex flex-col md:flex-row justify-between items-center border-t border-gray-200">
-            <div className="text-sm text-gray-500 mb-2 md:mb-0">
-              نمایش <span className="font-medium">{rows.length}</span> رکورد از {tdata.length} رکورد
+            <div className="text-sm text-gray-500 mb-2 md:mb-0 flex">
+              نمایش
+              <Select
+                label=""
+                defaultValue={10}
+                options={[
+                  { name: "10", value: 10 },
+                  { name: "20", value: 20 },
+                  { name: "30", value: 30 },
+                  { name: "40", value: 40 },
+                  { name: "50", value: 50 },
+                  { name: "100", value: 100 },
+                ]}
+                className="w-10"
+                onChange={handleChangeLimit}
+              />
+              رکورد از {count ?? data.rows.length} رکورد
             </div>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-4">
+                {renderPagination()}
+              </div>
+            )}
           </div>
         </div>
 

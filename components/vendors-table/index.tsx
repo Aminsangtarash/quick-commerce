@@ -3,6 +3,7 @@ import { CellProps } from "react-table";
 import Table, { Data, TableData } from "../table";
 import { useEffect, useState } from "react";
 import axios from "@/axios-instance";
+import { useSearchParams } from "next/navigation";
 
 const tableData: TableData = {
     rows: [],
@@ -22,21 +23,27 @@ const tableData: TableData = {
                 </span>
             )
         },
-    ]
+    ],
+    count: 0
 }
 
 export default function VendorsTable() {
     const [data, setData] = useState<TableData>(tableData);
+    const [limit, setLimit] = useState<number>(10);
+    const searchParams = useSearchParams();
+    const currentPage = (parseInt(searchParams.get("page") || "0") -1) * 10;
 
     useEffect(() => {
-        axios.get("/v1/vendors/?limit=10&offset=0",)
+        axios.get(`/v1/vendors/?limit=${limit}&offset=${currentPage}`,)
             .then((res) => {
-                setData(prev => ({ ...prev, rows: res.data.vendors }))
+                setData(prev => ({ ...prev, rows: res.data.vendors, ...res.data }));
             })
-    }, [])
+    }, [currentPage, limit])
+
+    const finalData = data
 
     return (
         data.rows.length > 0 &&
-        <Table data={data} />
+        <Table data={data} count={data.count} onChangeLimit={setLimit}/>
     );
 }

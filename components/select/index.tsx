@@ -18,7 +18,10 @@ function Select({ options = [], label, ...props }: SelectProps) {
                 className="outline-none py-1 pl-2"
                 {...props}
             >
-                <option value={1}>انتخاب کنید</option>
+                {
+                    !props.defaultValue &&
+                    <option value={1}>انتخاب کنید</option>
+                }
                 {
                     options.map((option) =>
                         <option key={option.name + "" + option.value} value={option.value}>{option.name}</option>
