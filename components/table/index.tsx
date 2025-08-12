@@ -55,8 +55,9 @@ const Table: FC<TableProps> = ({ data, count, onChangeLimit = () => {} }) => {
   }, [data.rows, currentPage, pageSize]);
 
   const handleChangeLimit = (event: ChangeEvent<HTMLSelectElement>) => {
+    handlePageChange(1)
     setPageSize(+event.currentTarget.value);
-    onChangeLimit(+event.currentTarget.value)
+    onChangeLimit(+event.currentTarget.value);
   }
 
   const columns = useMemo<ExtendedColumn<Data>[]>(() => data.columns, [data.columns]);
