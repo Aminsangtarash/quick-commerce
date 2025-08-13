@@ -5,6 +5,7 @@ import Card from "@/components/card";
 import MultiSelectCombobox from "@/components/combobox";
 import Dialog from "@/components/dialog";
 import Input from "@/components/input";
+import Messenger, { Message } from "@/components/messenger";
 import Select from "@/components/select";
 import { Product } from "@/types/product";
 import { Tag } from "@/types/tag";
@@ -78,6 +79,7 @@ const AddTagDialog: FC<AddTagDialogProps> = ({ open, onClose = () => { }, produc
                 </div>
                 <div className="p-4 max-w-md mx-auto">
                     <MultiSelectCombobox
+                        id="products_combo"
                         options={options}
                         value={selected}
                         onChange={setSelected}
@@ -107,16 +109,24 @@ const AddTagDialog: FC<AddTagDialogProps> = ({ open, onClose = () => { }, produc
     )
 }
 
+type Filter = {
+    search?: string | null;
+    booth: (string | number)[];
+    tag?: string | number | null;
+}
+
 function Products() {
     const [products, setProducts] = useState<Product[]>([]);
     const [checkedProducts, setCheckedProducts] = useState<number[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [filters, setFilters] = useState({ search: null, booth: 0, tag: null });
-    const [vendors, setVendors] = useState<Vendor[]>([])
+    const [filters, setFilters] = useState<Filter>({ search: null, booth: [], tag: null });
+    const [vendors, setVendors] = useState<Vendor[]>([]);
+    const [searchVendors, setSearchVendors] = useState<string | undefined>();
     const [tags, setTags] = useState<Tag[]>([]);
-    const [dialogData, setDialogData] = useState<DialogData>({ open: false })
+    const [dialogData, setDialogData] = useState<DialogData>({ open: false });
+    const [message, setMessage] = useState<Message>({ open: false });
 
     const fetchProducts = async (reset = false) => {
         if (loading) return;
@@ -126,9 +136,23 @@ function Products() {
                 params: {
                     per_page: 30,
                     page: reset ? 1 : (page + 1),
-                    product_title: filters.search,
-                    vendor_ids: +filters.booth ? +filters.booth : undefined,
+                    product_title: filters.search ?? undefined,
+                    vendor_ids: filters.booth && filters.booth.length > 0 ? filters.booth : undefined,
                     tag_id: filters.tag ? filters.tag : undefined,
+                },
+                paramsSerializer: (params) => {
+                    const searchParams = new URLSearchParams();
+                    for (const [key, value] of Object.entries(params)) {
+                        if (Array.isArray(value) && key === 'vendor_ids') {
+                            value.forEach((item) => searchParams.append(key, item));
+                        } else if (Array.isArray(value)) {
+                            value.forEach((item) => searchParams.append(`${key}[]`, item));
+                        } else if (value !== undefined) {
+                            searchParams.append(key, String(value));
+                        }
+                    }
+                    const queryString = searchParams.toString();
+                    return queryString;
                 },
             });
             const newProducts = response.data.data.products;
@@ -169,12 +193,30 @@ function Products() {
         setDialogData({ open: false })
     }, [])
 
+    const handleRemoveTags = () => {
+        if (filters.tag && checkedProducts?.length > 0) {
+            axios.delete("/tags/delete-tag-from-products", {
+                data: {
+                    product_ids: checkedProducts.map(item => (+item)),
+                    tag_id: +(filters.tag)
+                }
+            })
+                .then(res => {
+                    setMessage({
+                        open: true,
+                        text: "عملیات با موفقیت انجام شد",
+                        variant: "success"
+                    })
+                })
+        }
+    }
+
     useEffect(() => {
-        axios.get("/v1/vendors/?limit=10&offset=0")
+        axios.get(`/v1/vendors/?limit=10&offset=0${searchVendors ? "&vendor_name=" + searchVendors : ""}`)
             .then(res => {
                 setVendors(res.data.vendors)
             })
-    }, [])
+    }, [searchVendors])
 
     useEffect(() => {
         axios.get("/tags/tag-list")
@@ -185,17 +227,33 @@ function Products() {
 
     return (
         <div className="">
+            <Messenger message={message} />
             <AddTagDialog open={dialogData.open} onClose={handleCloseDialog} productIds={checkedProducts} tags={tags} />
-            <div className="flex flex-xs-col flex-md-row flex-wrap justify-center gap-5">
+            <div className="flex flex-xs-col flex-md-row flex-wrap justify-center items-center gap-5">
                 <Input
                     label="جستجو در عنوان"
                     onChange={(e) => handleFilterChange("search", e.target.value)}
                 />
-                <Select
+                {/* <Select
                     label="غرفه"
                     options={vendors?.map(vendor => ({ name: vendor.title, value: vendor.id }))}
                     onChange={(e) => handleFilterChange("booth", e.target.value)}
-                />
+                /> */}
+                <div>
+                    <MultiSelectCombobox
+                        id="vendors_combo"
+                        options={vendors}
+                        value={filters.booth}
+                        onChange={(value) => {
+                            setFilters(prev => ({ ...prev, booth: value }));
+                            setSearchVendors(undefined)
+                        }}
+                        onSearch={setSearchVendors}
+                        labelKey="title"
+                        valueKey="id"
+                        placeholder="غرفه ها"
+                    />
+                </div>
                 <Select
                     label="تگ"
                     options={tags?.map(tag => ({ name: tag.title, value: tag.tag_id }))}
@@ -205,13 +263,13 @@ function Products() {
             <div className="grid md:grid-cols-[130px_1fr] my-10">
                 <div className="hidden md:flex flex-col">
                     <Button className="" onClick={() => handleOpenTagDialog(checkedProducts)}>افزودن تگ</Button>
-                    <Button variant="error" className="mt-2">حذف تگ</Button>
+                    <Button variant="error" className="mt-2" onClick={handleRemoveTags} permission disabled={!(filters.tag) || +filters.tag === 0}>حذف تگ</Button>
                 </div>
                 <InfiniteScroll
                     dataLength={products?.length ?? 0}
                     next={() => fetchProducts()}
                     hasMore={hasMore}
-                    loader={products?.length === 0 ? <div className="text-center py-4">محصولی وجود ندارد</div> : <div className="py-4"></div> }
+                    loader={products?.length === 0 ? <div className="text-center py-4">محصولی وجود ندارد</div> : <div className="py-4"></div>}
                     endMessage={<div className="text-center py-4">محصولات بیشتری وجود ندارد</div>}
                 >
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 px-5">

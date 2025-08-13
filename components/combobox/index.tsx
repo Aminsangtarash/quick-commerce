@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 interface MultiSelectComboboxProps {
+    id: string;
     options: any[];
     value: (string | number)[];
     onChange: (value: (string | number)[]) => void;
@@ -11,6 +12,7 @@ interface MultiSelectComboboxProps {
 }
 
 export default function MultiSelectCombobox({
+    id,
     options,
     value,
     onChange,
@@ -113,6 +115,8 @@ export default function MultiSelectCombobox({
                         </span>
                     ))}
                     <input
+                        id={id}
+                        name={id}
                         type="text"
                         value={query}
                         onChange={(e) => {
@@ -125,13 +129,13 @@ export default function MultiSelectCombobox({
                         className="flex-1 outline-none bg-transparent min-w-[100px]"
                     />
                 </div>
-                {/* <button
+                <button
                     type="button"
                     className="px-2 text-gray-500"
                     onClick={() => setIsOpen((prev) => !prev)}
                 >
                     ▼
-                </button> */}
+                </button>
             </div>
             {error && (
                 <p className="mt-1 text-sm text-red-500">{error}</p>

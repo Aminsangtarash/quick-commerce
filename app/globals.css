@@ -9,9 +9,11 @@
   --primary: #2563eb;
   --secondary: #6b7280;
   --tertiary: #10b981;
-  --success: #10b981;
-  --error: #d33824;
   --border: #c1c1c1;
+  --info: #0092cc;
+  --success: #279772;
+  --warning: #e6aa05;
+  --error: #d33824;
 }
 
 @theme inline {
