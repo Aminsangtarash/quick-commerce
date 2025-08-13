@@ -1,4 +1,7 @@
+'use client'
+import { Suspense } from "react";
 import VendorsTable from "../components/vendors-table";
+import Loading from "@/components/loading";
 
 export default function Home() {
   return (
@@ -10,7 +13,9 @@ export default function Home() {
           Quick Commerce
         </h1>
         <div className="flex gap-4 items-center max-w-full flex-col sm:flex-row">
-          <VendorsTable/>
+          <Suspense fallback={<Loading />}>
+            <VendorsTable />
+          </Suspense>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
