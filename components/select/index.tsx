@@ -4,23 +4,24 @@ import { ComponentPropsWithoutRef } from "react";
 type SelectProps = {
     options: { value: number | string, name: string }[];
     label: string;
+    wrapperProps?: ComponentPropsWithoutRef<"div">
 } & ComponentPropsWithoutRef<"select">
 
-function Select({ options = [], label, ...props }: SelectProps) {
+function Select({ options = [], label, wrapperProps = {}, ...props }: SelectProps) {
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col" {...wrapperProps}>
             <div className="flex items-center">
                 <span className="ml-1">{label}</span>
                 <div className="border-b border-width border-[var(--border)] w-full"></div>
             </div>
             <select
-                defaultValue={1}
-                className="outline-none py-1 pl-2"
+                defaultValue={0}
+                className="outline-none py-1 pl-2 w-full"
                 {...props}
             >
                 {
                     !props.defaultValue &&
-                    <option value={1}>انتخاب کنید</option>
+                    <option value={0}>انتخاب کنید</option>
                 }
                 {
                     options.map((option) =>
