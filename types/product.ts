@@ -1,5 +1,6 @@
 import { Category } from "./category";
 import { Picture } from "./picture";
+import { Tag } from "./tag";
 import { Vendor } from "./vendor";
 
 // interface LocationDeployment {
@@ -42,5 +43,6 @@ export interface Product {
     status: number;
     updated_at: string;
     vendor_id: number;
-    extra: ProductExtra
+    extra: ProductExtra;
+    tag: Partial<Tag>;
 }

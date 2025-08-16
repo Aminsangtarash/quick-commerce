@@ -10,7 +10,7 @@ import Select from "@/components/select";
 import { Product } from "@/types/product";
 import { Tag } from "@/types/tag";
 import { Vendor } from "@/types/vendor";
-import { ChangeEvent, FC, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, FC, memo, useCallback, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 type DialogData = {
@@ -20,10 +20,11 @@ type DialogData = {
 
 type AddTagDialogProps = {
     onClose?: () => void;
+    onDone?: () => void;
     tags: Tag[]
 } & DialogData;
 
-const AddTagDialog: FC<AddTagDialogProps> = ({ open, onClose = () => { }, productIds = [], tags }) => {
+const AddTagDialog: FC<AddTagDialogProps> = memo(({ open, onClose = () => { }, productIds = [], tags, onDone }) => {
     const [selected, setSelected] = useState<(string | number)[]>([]);
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     const [options, setOptions] = useState<any[]>([]);
@@ -67,6 +68,7 @@ const AddTagDialog: FC<AddTagDialogProps> = ({ open, onClose = () => { }, produc
             })
                 .then(res => {
                     setSelected([]);
+                    onDone?.()
                 })
         }
     }
@@ -107,7 +109,7 @@ const AddTagDialog: FC<AddTagDialogProps> = ({ open, onClose = () => { }, produc
             </div>
         </Dialog>
     )
-}
+})
 
 type Filter = {
     search?: string | null;
@@ -225,10 +227,26 @@ function Products() {
             })
     }, [])
 
+    const handleAddDone = useCallback(() => {
+        setMessage({
+            open: true,
+            text: "عملیات با موفقیت انجام شد",
+            variant: "success"
+        })
+        setDialogData({ open: false })
+        fetchProducts()
+    }, [])
+
     return (
         <div className="">
             <Messenger message={message} />
-            <AddTagDialog open={dialogData.open} onClose={handleCloseDialog} productIds={checkedProducts} tags={tags} />
+            <AddTagDialog
+                open={dialogData.open}
+                onClose={handleCloseDialog}
+                productIds={checkedProducts}
+                tags={tags}
+                onDone={handleAddDone}
+            />
             <div className="flex flex-xs-col flex-md-row flex-wrap justify-center items-center gap-5">
                 <Input
                     label="جستجو در عنوان"
@@ -281,6 +299,7 @@ function Products() {
                                 price={product.extra?.price / 10}
                                 checked={checkedProducts.includes(product.product_id)}
                                 onClick={() => handleClickProduct(product.product_id)}
+                                tag={product.tag}
                             />
                         ))}
                     </div>

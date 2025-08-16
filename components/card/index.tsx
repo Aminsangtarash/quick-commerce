@@ -1,3 +1,4 @@
+import { Tag } from "@/types/tag";
 import Image from "next/image";
 import { ComponentPropsWithoutRef } from "react";
 import { twMerge } from "tailwind-merge";
@@ -7,9 +8,10 @@ type CardProps = {
     title: string;
     price: number;
     checked: boolean;
+    tag: Partial<Tag>;
 } & ComponentPropsWithoutRef<"div"> 
 
-function Card({ imageUrl, title, price, checked, className, ...props }: CardProps) {
+function Card({ imageUrl, title, price, checked, className, tag, ...props }: CardProps) {
     return (
         <div className={twMerge(className, "overflow-hidden w-full flex flex-col justify-center items-center p-2 shadow-lg rounded-lg cursor-pointer ")} {...props}>
             <div className="flex justiry-center items-center border border-[#f9f2f2] w-full lg:h-[10vw] overflow-hidden rounded-lg relative">
@@ -20,8 +22,8 @@ function Card({ imageUrl, title, price, checked, className, ...props }: CardProp
                     </div>
                 }
                 {
-                    <div className="absolute top-1 left-2">
-
+                    <div className="absolute top-1 left-2 bg-[#ff5e00] text-white px-3 rounded-sm">
+                        {tag?.tag_name}
                     </div>
                 }
                 {
